@@ -1,0 +1,31 @@
+<section class="w-full max-w-screen-xl m-auto h-full bg-white p-4 rounded-md shadow-md space-y-5">
+    <div class="flex items-center justify-center space-x-4">
+        <hr class="flex-grow border-gray-300">
+        <button id="" onclick="openCloseObservacoes()" class="text-center font-semibold text-xl text-gray-600 hover:text-blue-500 duration-200 ">OBSERVAÇÕES</button>
+        <hr class="flex-grow border-gray-300">
+    </div>
+
+    <form class="space-y-4 hidden" id="formObservacoes">
+
+        <div>
+            <textarea name="" id="observacoes" class="mt-1 block w-full h-52 p-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>               
+        </div>
+  
+    </form>
+</section>
+
+<script>
+    let openObservacoes = false
+
+    function openCloseObservacoes(){
+        const formObservacoes = document.getElementById("formObservacoes")
+        if(openObservacoes){
+            formObservacoes.classList.add("hidden");
+            openObservacoes = false
+        }else{
+            formObservacoes.classList.remove("hidden");
+            openObservacoes = true
+
+        }
+    }
+</script>

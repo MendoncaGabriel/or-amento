@@ -1,0 +1,112 @@
+<section class="w-full max-w-screen-xl m-auto h-full bg-white p-4 rounded-md shadow-md space-y-5">
+    <div class="flex items-center justify-center space-x-4">
+        <hr class="flex-grow border-gray-300">
+        <h1 class="text-center font-semibold text-xl text-gray-600">BUSCAR PRODUTO</h1>
+        <hr class="flex-grow border-gray-300">
+    </div>
+    <div class="flex items-center justify-center space-x-2">
+        <input id="inputEAN" type="text" class="px-4 py-2 shadow-md rounded-sm border w-full" placeholder="Codigo Auxiliar">
+        <button onclick="buscarProduto()" class="px-4 p-2 bg-blue-600 hover:bg-blue-700 duration-100 hover:drop-shadow-sm text-white font-semibold">Buscar</button>
+    </div>
+</section>
+
+<script>
+    const inputEAN = document.getElementById("inputEAN")
+    inputEAN.addEventListener("keyup", (event)=>{
+        if(event.keyCode == 13) buscarProduto();
+    })
+
+    // Foca no input assim que a página carregar
+    window.onload = function() {
+        inputEAN.focus();
+    };
+
+
+    function trancarSelectTabela() {
+        const selectElement = document.getElementById('paymentMethod');
+        selectElement.disabled = true;
+    }
+
+    function idAleatorio() {
+        return Math.floor(10000000 + Math.random() * 90000000);
+    }
+
+    function addProduto({productId, descricao, price}){
+        const listaProduto = document.getElementById('listaProduto');
+        const id = "tr" + idAleatorio();
+        listaProduto.innerHTML += `
+        <tr class="border-b border-gray-200" id="${id}">
+            <td class="py-3 px-6">${productId}</td>
+            <td class="py-3 px-6 text-sm min-w-52">${descricao}</td>
+            <td class="py-3 px-6">
+                <input type="number" max="99" min="1" class="border quantity text-center" value="1" oninput="updateTotal(this)">
+            </td>
+                <td class="p-2 price w-20">R$ ${price}</td>
+                <td class="p-2 total w-20">R$ ${price}</td>
+                <td class="py-3 px-6">
+                <button onclick="btnRemove('${id}')" class="bg-red-500 hover:bg-red-600 hover:shadow-md duration-100 flex items-center justify-center px-5 py-2 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fil text-white" viewBox="0 0 16 16">
+                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                    </svg>
+                </button>
+            </td>
+        </tr>
+        `;
+    }
+    
+    function getpaymentMethod(){
+        const selectElement = document.getElementById('paymentMethod');
+        console.log(selectElement)
+        return selectElement.value
+    }
+
+    function buscarProduto(){
+        const inputEAN = document.getElementById('inputEAN')
+        if(inputEAN.value.length == 0) return alert("digite o codigo de barras!")
+
+        let ean = inputEAN.value;
+        if (ean[0] !== '0') {
+            ean = '0' + ean;
+        }
+
+        const url = `/api/produto/${ean}`;
+
+        fetch(url, {
+            method: "GET",
+            headers: {"Content-Type":"application/json"}
+        })
+        .then(res => res.json())
+        .then(res => {
+            addProduto({
+                productId: res.produto.productId,
+                descricao: res.produto.descricao,
+                price: res.produto.price[getpaymentMethod()]
+
+            })
+            document.getElementById('inputEAN').value = ""
+            inputEAN.focus();
+            trancarSelectTabela()
+        })
+    }
+    
+    function btnRemove(tr){
+        document.getElementById(tr).remove();
+    }
+
+    function updateTotal(element) {
+        let quantity = element.value;
+        let priceElement = element.closest('tr').querySelector('.price');
+        let totalElement = element.closest('tr').querySelector('.total');
+        
+        let price = parseFloat(priceElement.innerText.replace('R$ ', ''));
+        let total = (quantity * price).toFixed(2);
+        
+        totalElement.innerText = "R$ " + total;
+    }
+
+  
+
+    // atacado - pix e  dinheito
+    // boleto - decorador 
+    // varejo - debito e credito
+</script>

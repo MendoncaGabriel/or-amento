@@ -1,0 +1,107 @@
+<section class="w-full max-w-screen-xl m-auto h-full bg-white p-4 rounded-md shadow-md space-y-5">
+    <div class="flex items-center justify-center space-x-4">
+        <hr class="flex-grow border-gray-300">
+        <button id="btnOpenCloseFormCadastroCliente" class="text-center font-semibold text-xl text-gray-600 hover:text-blue-500 duration-200 ">DADOS DO CLIENTE</button>
+        <hr class="flex-grow border-gray-300">
+    </div>
+
+    <div id="formCadastroCliente" class="hidden">
+        <div class=" grid grid-cols-3 gap-5" >
+            <div>
+                <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
+                <input type="text" id="nome" name="nome" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="João da Silva">
+            </div>
+            <div>
+                <label for="telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                <input type="text" id="telefone" name="telefone" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="(11) 98765-4321">
+            </div>
+            <div>
+                <label for="cpf_cnpj" class="block text-sm font-medium text-gray-700">CPF/CNPJ</label>
+                <input type="text" id="cpf_cnpj" name="cpf_cnpj" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="123.456.789-00">
+            </div>
+            <div>
+                <label for="endereco" class="block text-sm font-medium text-gray-700">Endereço</label>
+                <input type="text" id="endereco" name="endereco" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Rua Exemplo, 123">
+            </div>
+            <div>
+                <label for="bairro" class="block text-sm font-medium text-gray-700">Bairro</label>
+                <input type="text" id="bairro" name="bairro" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Centro">
+            </div>
+            <div>
+                <label for="cidade" class="block text-sm font-medium text-gray-700">Cidade</label>
+                <input type="text" id="cidade" name="cidade" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="São Paulo">
+            </div>
+            <div>
+                <label for="estado" class="block text-sm font-medium text-gray-700">Estado</label>
+                <input type="text" id="estado" name="estado" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="SP">
+            </div>
+            <div>
+                <label for="cep" class="block text-sm font-medium text-gray-700">CEP</label>
+                <input type="text" id="cep" name="cep" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="01234-567">
+            </div>
+            <div class="col-span-3 flex justify-center space-x-4 w-full ">
+                <button type="button" id="btnCreateClient" onclick="buscarCliente()" class="px-4 p-2 w-full max-w-96 bg-green-600 hover:bg-green-700 duration-100 hover:drop-shadow-sm text-white font-semibold">Buscar</button>
+            </div>
+        </div>
+    </div>
+    
+
+    <script>
+        const formCadastroCliente = document.getElementById("formCadastroCliente")
+        const btnOpenCloseFormCadastroCliente = document.getElementById("btnOpenCloseFormCadastroCliente")
+        
+
+        function buscarCliente(){
+            fetch(`/api/cliente/asdf`, {
+                method: "GET",
+                headers: {"Content-Type": "application/json"},
+            })
+            .then(res => res.json())
+            .then(res => {
+                console.log(res)
+                preencherFormulario(res.cliente)
+            })
+        }
+
+        function preencherFormulario(cliente){
+            document.getElementById("nome").value = cliente.nome
+            document.getElementById("telefone").value = cliente.telefone
+            document.getElementById("cpf_cnpj").value = cliente.cpf_cnpj
+            document.getElementById("endereco").value = cliente.endereco
+            document.getElementById("bairro").value = cliente.bairro
+            document.getElementById("cidade").value = cliente.cidade
+            document.getElementById("estado").value = cliente.estado
+            document.getElementById("cep").value = cliente.cep
+        }
+
+        let open = false;
+        btnOpenCloseFormCadastroCliente.addEventListener('click', () => {
+            if(open == false){
+                formCadastroCliente.classList.remove("hidden")
+                open = true
+            }else{
+                formCadastroCliente.classList.add("hidden")
+                open = false
+            }
+        })
+
+        const inputCep = document.getElementById('cep');
+        inputCep.addEventListener('keyup', (event) =>{
+            handleInputCep(event.target.value)
+        })
+
+        //preencher inputs com resultado
+        async function handleInputCep(cep){
+            if(cep.length == 8){
+                const endereco = await buscarEndereco(cep);
+                document.querySelector('#bairro').value = endereco.bairro || '';
+                document.querySelector('#endereco').value = endereco.complemento || '';
+                document.querySelector('#cidade').value = endereco.localidade || '';
+                document.querySelector('#endereco').value = endereco.logradouro || '';
+                document.querySelector('#estado').value = endereco.uf || '';
+            }
+        }
+
+    </script>
+    
+</section>

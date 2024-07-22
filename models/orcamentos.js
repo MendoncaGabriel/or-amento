@@ -8,7 +8,7 @@ const Orcamento = sequelize.define('Orcamento', {
     defaultValue: DataTypes.NOW,
     allowNull: false
   },
-  items:  DataTypes.STRING,
+  items:  DataTypes.TEXT,
   formaPagamento: DataTypes.STRING,
   observacoes: DataTypes.STRING,
   cliente: DataTypes.STRING,
