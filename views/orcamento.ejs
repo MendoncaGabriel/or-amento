@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-500">
+    <!-- Pagina -->
+    <section class="bg-white m-auto w-[210mm] h-[297mm] p-2 space-y-2"> 
+
+        <header class="border-2 border-black flex items-center justify-around p-5">
+            <img src="/images/logo.png" class="w-72">
+          
+            <div class="">
+                <h1 class="font-bold text-center text-3xl">Orçamento de Serviços</h1>
+                <p><b>Nome fantasia:</b> <%= empresa.nome %></p>
+                <p><b>CNPJ:</b> <%= empresa.cnpj %> <b>IE:</b> <%= empresa.ie %></p>
+                <p><b>Rua:</b> <%= empresa.rua %></p>
+                <p><b>Tel:</b> <%= empresa.tel %> - <b>FIXO:</b> <%= empresa.fixo %></p>
+                <p><b>Email:</b> <%= empresa.email %></p>
+                <p><b>Site:</b> <%= empresa.site %></p>
+            </div>
+        </header>
+     
+
+        <section class="flex  border-2 border-black">   
+            <div class=" p-2 w-1/3 text-center">Orçamento n°: <b><%= id %></b></div>
+            <div class="border-x-2 border-black p-2 w-1/3 text-center">Emitido em: <b><%= createdAt %></b></div>
+            <div class=" p-2 w-1/3 text-center">Válido até: <b><%= vencimento %></b></div>
+        </section>
+
+        <!-- Cliente -->
+        <section class="border-2 border-gray-800 p-4 mb-2 bg-white  shadow-md">
+            <h1 class="text-xl font-bold mb-4 text-center">CLIENTE</h1>
+            <hr>
+            <div>
+                <p><b>Nome:</b> <%= typeof cliente.nome != "undefined" && cliente.nome ? cliente.nome : "" %></p>
+                <p><b>Telefone:</b> <%= typeof cliente.telefone != "undefined" && cliente.telefone ? cliente.telefone : "" %></p>
+                <p><b>CPF/CNPJ:</b> <%= typeof cliente.cpf_cnpj != "undefined" && cliente.cpf_cnpj ? cliente.cpf_cnpj : "" %></p>
+                <p><b>Endereço:</b> <%= typeof cliente.endereco != "undefined" && cliente.endereco ? cliente.endereco : "" %></p>
+                <p><b>Bairro:</b> <%= typeof cliente.bairro != "undefined" && cliente.bairro ? cliente.bairro : "" %> <b>Cidade:</b> <%= typeof cliente.cidade != "undefined" && cliente.cidade ? cliente.cidade : "" %>, <b>Estado:</b> <%= typeof cliente.estado != "undefined" && cliente.estado ? cliente.estado : "" %>, <b>Cep:</b> <%= typeof cliente.cep != "undefined" && cliente.cep ? cliente.cep : "" %></p>
+            </div>
+        </section>
+
+        <!-- Produtos -->
+        <div class="  border-2 border-black p-2 ">
+            <h1 class="text-xl font-bold mb-2 text-center">ORÇAMENTO</h1>
+            
+            <table class="min-w-full bg-white  shadow-md">
+                <thead>
+                    <tr class="bg-gray-800 text-white">
+                        <th class="py-3 px-6 text-left">Item</th>
+                        <th class="py-3 px-6 text-left">Produto/Serviço</th>
+                        <th class="py-3 px-6 text-left">Quantidade</th>
+                        <th class="py-3 px-6 text-left">Valor</th>
+                        <th class="py-3 px-6 text-left">Total</th>
+                    </tr>
+                </thead>
+                <tbody>           
+                    <% items.forEach(element => { %>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 px-6"><%= element.productId %></td>
+                            <td class="py-3 px-6"><%= element.descricao %></td>
+                            <td class="py-3 px-6"><%= element.quantidade %></td>
+                            <td class="py-3 px-6"><%= element.price %></td>
+                            <td class="py-3 px-6"><%= element.total %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Valores -->
+        <section class="flex  border-2 border-black overflow-hidden">
+            <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>SUBTOTAL:</b> R$ -</div>
+            <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>ORÇAMENTO:</b> R$ -</div>
+            <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>ACRÉSCIMO:</b> R$ -</div>
+            <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>TOTAL: </b>R$ <%= somaTotal %></div>
+        </section>
+
+        <!-- Observações -->
+        <section class="border-2 border-black p-2 ">
+            <h1 class="text-xl font-bold mb-2 text-center">OBSERVAÇÕES</h1>
+            <hr>
+            <div class="p-2">
+                <p><b>Forma de Pagamento:</b> <%= formaPagamento  %></p>
+                <!-- <p><b>Acréscimo:</b> R$ 100,00 - Por ser domingo de noite.</p>
+                <p><b>Desconto:</b> R$ 50,00 - Desconto para pagamento adiantado em Dinheiro.</p> -->
+                <p><b>Observações:</b> <%= observacoes %> </p>
+            </div>
+        </section>
+    </section>
+    
+</body>
+</html>
+<script src="index.js">
+
+    
+</script>
