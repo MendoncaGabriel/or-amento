@@ -12,6 +12,7 @@ var app = express();
 // Tabelas
 const orçamento = require('./models/orcamentos');
 const empresa = require('./models/empresa')
+const vendedor = require('./models/vendedor')
 
 // Função de sincronização modelos e tabelas
 db.sync({ force: false }) // `force: false` garante que não irá apagar tabelas existentes, `true` faz isso.

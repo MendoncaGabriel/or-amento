@@ -52,13 +52,15 @@
         
 
         function buscarCliente(){
-            fetch(`/api/cliente/asdf`, {
+            const nome = document.getElementById("nome")
+            if(!nome) return alert("Digite o nome")
+
+            fetch(`/api/cliente/${nome.value}`, {
                 method: "GET",
                 headers: {"Content-Type": "application/json"},
             })
             .then(res => res.json())
             .then(res => {
-                console.log(res)
                 preencherFormulario(res.cliente)
             })
         }

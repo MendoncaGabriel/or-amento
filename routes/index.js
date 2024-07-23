@@ -7,6 +7,7 @@ router.get('/orcamento/:id', indexController.orcamentoPage);
 
 // API
 router.post('/api/orcamento/create', indexController.createOrcamento)
+router.post('/api/vendedor', indexController.checkVendedor)
 router.get('/api/cliente/:name', indexController.getByName)
 router.get('/api/produto/:ean', indexController.getProductByEanCode)
 

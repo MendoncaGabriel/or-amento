@@ -1,0 +1,181 @@
+<section class="w-full max-w-screen-xl m-auto h-full bg-white p-4 rounded-md shadow-md space-y-5">
+    <div class="flex items-center justify-center space-x-4">
+        <hr class="flex-grow border-gray-300">
+        <button id="formVendedorBtn" class="text-center font-semibold text-xl text-gray-600 hover:text-blue-500 duration-200 ">VENDEDOR (A)</button>
+        <hr class="flex-grow border-gray-300">
+    </div>
+
+    <div id="formVendedor" class="">
+        <div class="flex items-center justify-center space-x-4" >
+            <div>
+                <select required name="" id="selectVendedor" class="border px-4 py-2 shadow-sm">
+                    <option value=""  selected disabled >Selecione um vendedor</option>
+                    <% vendedores.forEach(element => { %>
+                        <option value="<%= element.id %>"><%= element.nome %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="">
+                <input id="senhaVendedor" required type="password" class="border px-4 py-2 shadow-sm" placeholder="senha">
+            </div>
+            <button onclick="gerarOrçamento()" class="border px-4 p-2 bg-blue-600 hover:bg-blue-700 duration-100 hover:drop-shadow-sm text-white font-semibold">
+                Gerar Orçamento
+            </button>
+            
+        </div>
+    </div>
+    
+</section>
+
+<script>
+    const formVendedor = document.getElementById("formVendedor")
+    const formVendedorBtn = document.getElementById("formVendedorBtn")
+    
+    let openVendedor = true;
+    formVendedorBtn.addEventListener('click', () => {
+        if(openVendedor == false){
+            formVendedor.classList.remove("hidden")
+            openVendedor = true
+        }else{
+            formVendedor.classList.add("hidden")
+            openVendedor = false
+        }
+    })
+
+    function buscarEndereco(cep) {
+        return new Promise((resolve, reject) => {
+            if(!cep) throw new Error('cep não informado')
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(res => res.json())
+            .then(res => {
+                resolve(res)
+            })
+            .catch(error => {
+                reject(error)
+            });
+        })
+    }
+
+    function getDataUserVendedor(){
+        return {
+            vendedorId: document.getElementById("selectVendedor").value,
+            senha: document.getElementById("senhaVendedor").value
+        }
+    }
+
+    function checkUserVendedor(){
+        return new Promise((resolve, reject) => {
+            fetch("/api/vendedor", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(getDataUserVendedor())
+            })
+            .then(res => res.json())
+            .then(res => {
+                resolve(res.msg) 
+            })
+            .catch(error => {
+                console.log(error)
+                reject(res.msg)
+            })
+        })
+    }
+
+    function getDataFormClient(){
+        return {
+            nome: document.getElementById("nome").value,
+            telefone: document.getElementById("telefone").value,
+            cpf_cnpj: document.getElementById("cpf_cnpj").value,
+            endereco: document.getElementById("endereco").value,
+            bairro: document.getElementById("bairro").value,
+            cidade: document.getElementById("cidade").value,
+            estado: document.getElementById("estado").value,
+            cep: document.getElementById("cep").value
+        }
+    }
+
+    function getDataVendedor() {
+        const selectElement = document.getElementById("selectVendedor");
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const innerText = selectedOption.innerText;
+
+        console.log(innerText)
+
+
+
+        return {
+            id: selectElement.value,
+            nome: innerText,
+            senha: document.getElementById("senhaVendedor").value
+        };
+    }
+
+    async function gerarOrçamento() {
+        const checkVendedor = await checkUserVendedor();
+        if(checkVendedor != "Autorizado!") return alert(checkVendedor);
+
+        if(verificarFomCliente() == "interromper") return;
+
+        const listaProdutos = getListaProdutos();
+        if(!listaProdutos) return alert("Itens não foram adicionados!");
+        
+        const formaPagamento =  getSelectedOptionText();
+        const observacoes = document.getElementById('observacoes').value;
+        const cliente = getDataFormClient()
+
+        fetch('/api/orcamento/create', {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                produtos: listaProdutos,
+                formaPagamento: formaPagamento,
+                observacoes: observacoes,
+                cliente: cliente,
+                vendedor: getDataVendedor()
+            })
+        })
+        .then(res => res.json())
+        .then(res => {
+            console.log(res)
+            const id = res.novoOrcamento.id
+            location.href = `/orcamento/${id}`
+        }) 
+    }
+
+    function getListaProdutos(){
+        const listaProduto = document.querySelectorAll('#listaProduto tr');
+        const produtos = [];
+
+        listaProduto.forEach(tr => {
+            const tds = tr.querySelectorAll('td');
+            if (tds.length > 0) { 
+                const produto = {
+                    productId: tds[0].textContent.trim(),
+                    descricao: tds[1].textContent.trim(),
+                    quantidade: tds[2].querySelector('input').value.trim(),
+                    price: tds[3].textContent.trim().replace('R$ ', ''),
+                    total: tds[4].textContent.trim().replace('R$ ', '')
+                };
+                produtos.push(produto);
+            }
+        });
+        return produtos
+    }
+
+    function verificarFomCliente(){
+        if(document.getElementById("nome").value.length == 0 ){
+            alert("Verifique o nome do cliente")
+            return "interromper"
+        }
+    }
+
+    function getSelectedOptionText() {
+        const selectElement = document.getElementById('paymentMethod');
+        const selectedIndex = selectElement.selectedIndex;
+        const selectedOption = selectElement.options[selectedIndex];
+        const selectedOptionText = selectedOption.innerText;
+        return selectedOptionText;
+    }
+
+</script>
+    

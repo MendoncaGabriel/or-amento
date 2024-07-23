@@ -12,6 +12,7 @@ const Orcamento = sequelize.define('Orcamento', {
   formaPagamento: DataTypes.STRING,
   observacoes: DataTypes.STRING,
   cliente: DataTypes.STRING,
+  vendedor: DataTypes.STRING,
 });
 
 

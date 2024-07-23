@@ -17,11 +17,6 @@
         </select>
     </div>
 
-    <button onclick="gerarOrçamento()" class="px-4 p-2 bg-blue-600 hover:bg-blue-700 duration-100 hover:drop-shadow-sm text-white font-semibold">
-        Gerar Orçamento
-    </button>
-    
-
     <table class="min-w-full bg-white shadow-md">
         <thead>
             <tr class="bg-gray-800 text-white">
@@ -38,90 +33,3 @@
     
 </section>
 
-<script>
-    function buscarEndereco(cep) {
-        return new Promise((resolve, reject) => {
-            if(!cep) throw new Error('cep não informado')
-            fetch(`https://viacep.com.br/ws/${cep}/json/`)
-            .then(res => res.json())
-            .then(res => {
-                resolve(res)
-            })
-            .catch(error => {
-                reject(error)
-            });
-        })
-    }
-
-    async function gerarOrçamento() {
-        if(verificarFomCliente() == "interromper") return;
-
-        const listaProdutos = getListaProdutos();
-        const formaPagamento =  getSelectedOptionText();
-        const observacoes = document.getElementById('observacoes').value;
-        const cliente = {
-            nome: document.getElementById("nome").value,
-            telefone: document.getElementById("telefone").value,
-            cpf_cnpj: document.getElementById("cpf_cnpj").value,
-            endereco: document.getElementById("endereco").value,
-            bairro: document.getElementById("bairro").value,
-            cidade: document.getElementById("cidade").value,
-            estado: document.getElementById("estado").value,
-            cep: document.getElementById("cep").value
-        }
-
-        if(!listaProdutos) return alert("Itens não foram adicionados!")
-      
-        fetch('/api/orcamento/create', {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                produtos: listaProdutos,
-                formaPagamento: formaPagamento,
-                observacoes: observacoes,
-                cliente: cliente
-            })
-        })
-        .then(res => res.json())
-        .then(res => {
-            console.log(res)
-            const id = res.novoOrcamento.id
-            location.href = `/orcamento/${id}`
-        }) 
-    }
-
-    function getListaProdutos(){
-        const listaProduto = document.querySelectorAll('#listaProduto tr');
-        const produtos = [];
-
-        listaProduto.forEach(tr => {
-            const tds = tr.querySelectorAll('td');
-            if (tds.length > 0) { 
-                const produto = {
-                    productId: tds[0].textContent.trim(),
-                    descricao: tds[1].textContent.trim(),
-                    quantidade: tds[2].querySelector('input').value.trim(),
-                    price: tds[3].textContent.trim().replace('R$ ', ''),
-                    total: tds[4].textContent.trim().replace('R$ ', '')
-                };
-                produtos.push(produto);
-            }
-        });
-        return produtos
-    }
-
-    function verificarFomCliente(){
-        if(document.getElementById("nome").value.length == 0 ){
-            alert("Verifique o nome do cliente")
-            return "interromper"
-        }
-    }
-
-    function getSelectedOptionText() {
-        const selectElement = document.getElementById('paymentMethod');
-        const selectedIndex = selectElement.selectedIndex;
-        const selectedOption = selectElement.options[selectedIndex];
-        const selectedOptionText = selectedOption.innerText;
-        return selectedOptionText;
-    }
-</script>

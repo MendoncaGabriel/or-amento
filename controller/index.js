@@ -1,7 +1,8 @@
-const varejo = require('../services/index');
-const Orçamento = require('../models/orcamentos');
+const varejo = require('../services/index')
+const Orçamento = require('../models/orcamentos')
 const Empresa = require('../models/empresa')
 const Cliente = require('../models/cliente')
+const Vendedor = require('../models/vendedor')
 
 exports.createCliente = async (req, res) => {
     const cliente = req.body
@@ -9,17 +10,32 @@ exports.createCliente = async (req, res) => {
     const novoCliente = await Cliente.create(cliente);
     res.status(200).json({msg: "Cliente salvo com sucesso!", novoCliente})
 }
+
+exports.checkVendedor = async (req, res) => {
+    const {vendedorId, senha} = req.body
+
+    const vendedor = await Vendedor.findByPk(vendedorId);
+    if(!vendedor) return res.status(404).json({msg: "Vendedor não encontrado!"})
+
+    if(senha != vendedor.dataValues.senha) return res.status(401).json({msg: "Senha incorreta!"})
+
+    res.status(200).json({msg: "Autorizado!", vendedor})
+}
+
 exports.getByName = async (req, res) => {
     const nome = req.body.nome
 
-    const cliente = await Cliente.findOne({nome: nome});
+    const cliente = await Cliente.findOne({where: {nome: nome}});
     res.status(200).json({msg: "Resgatado com sucesso!", cliente})
 }
 
 exports.criarOrcamentoPage = async (req, res) => {
     try {
+
+        const vendedores = await Vendedor.findAll()
+
     
-        res.render('home', { title: 'Express' });
+        res.render('home', { title: 'Express', vendedores });
         
     } catch (error) {
         console.log(error)
@@ -58,13 +74,14 @@ function vencimento(dateStr, daysToAdd) {
 }
 
 
-
 exports.orcamentoPage = async (req, res) => {
     
     const id = req.params.id;
     try {
         const orçamento = await Orçamento.findByPk(id);
         const empresa = await Empresa.findByPk(1);
+
+        console.log("===> orçamento.dataValues.cliente", orçamento.dataValues.cliente)
    
         const listaItems = JSON.parse(orçamento.dataValues.items)
         const somaTotal = listaItems.reduce((acc, e) => acc + parseFloat(e.total), 0);
@@ -79,7 +96,8 @@ exports.orcamentoPage = async (req, res) => {
             formaPagamento: orçamento.formaPagamento,
             observacoes: orçamento.dataValues.observacoes,
             cliente: JSON.parse(orçamento.dataValues.cliente),
-            somaTotal: Number(somaTotal).toFixed(2)
+            somaTotal: Number(somaTotal).toFixed(2),
+            vendedor: JSON.parse(orçamento.dataValues.vendedor)
         });
     } catch (error) {
         console.error("Erro ao buscar orçamento:", error);
@@ -88,25 +106,36 @@ exports.orcamentoPage = async (req, res) => {
 }
 
 exports.createOrcamento = async (req, res) => {
-    const {produtos, formaPagamento, observacoes, cliente} = req.body
+    const { produtos, formaPagamento, observacoes, cliente, vendedor } = req.body;
 
-    // Verificar se usuario ja foi cadastrado
-    const clienteCheck = await Cliente.findOne({nome: cliente.nome})
-    if(!clienteCheck){
-        await Cliente.create(cliente)
+    try {
+        // Verificar se o cliente já foi cadastrado
+        let clienteCheck = await Cliente.findOne({ where: {nome: cliente.nome}});        
+    
+        if (!clienteCheck) {
+            clienteCheck = await Cliente.create(cliente);
+            console.log("Novo cliente cadastrado:", clienteCheck);
+
+        } else {
+            console.log("Cliente já existe:", clienteCheck);
+        }
+
+    
+        const novoOrcamento = await Orçamento.create({
+            data: new Date(),
+            items: JSON.stringify(produtos),
+            formaPagamento: formaPagamento,
+            observacoes: observacoes,
+            cliente: JSON.stringify(clienteCheck),
+            vendedor: JSON.stringify(vendedor.nome)
+        });
+
+        res.status(200).json({ msg: "Orçamento criado com sucesso!", novoOrcamento });
+    } catch (error) {
+        console.error("Erro ao criar orçamento:", error);
+        res.status(500).json({ msg: "Erro ao criar orçamento", error });
     }
-   
-
-    const novoOrcamento = await Orçamento.create({
-        data: new Date(),
-        items: JSON.stringify(produtos),
-        formaPagamento: formaPagamento,
-        observacoes: observacoes,
-        cliente: JSON.stringify(cliente)
-    });
-
-    res.status(200).json({msg: "Orçamento criado com sucesso!", novoOrcamento})
-}
+};
 
 exports.getProductByEanCode = async (req, res) => {
     const ean = req.params.ean
