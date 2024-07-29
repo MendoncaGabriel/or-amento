@@ -4,85 +4,102 @@ const Empresa = require('../models/empresa')
 const Cliente = require('../models/cliente')
 const Vendedor = require('../models/vendedor')
 
-exports.createCliente = async (req, res) => {
-    const cliente = req.body
-
-    const novoCliente = await Cliente.create(cliente);
-    res.status(200).json({msg: "Cliente salvo com sucesso!", novoCliente})
-}
-
-exports.checkVendedor = async (req, res) => {
-    const {vendedorId, senha} = req.body
-
-    const vendedor = await Vendedor.findByPk(vendedorId);
-    if(!vendedor) return res.status(404).json({msg: "Vendedor não encontrado!"})
-
-    if(senha != vendedor.dataValues.senha) return res.status(401).json({msg: "Senha incorreta!"})
-
-    res.status(200).json({msg: "Autorizado!", vendedor})
-}
-
-exports.getByName = async (req, res) => {
-    const nome = req.body.nome
-
-    const cliente = await Cliente.findOne({where: {nome: nome}});
-    res.status(200).json({msg: "Resgatado com sucesso!", cliente})
-}
-
-exports.criarOrcamentoPage = async (req, res) => {
-    try {
-
-        const vendedores = await Vendedor.findAll()
-
-    
-        res.render('home', { title: 'Express', vendedores });
-        
-    } catch (error) {
-        console.log(error)
-    }
-
-}
-
 function formatDateTime(date) {
-    // Obtém as partes da data e hora
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    // Formata e retorna a string no formato desejado
     return `${day}/${month}/${year} - ${hours}:${minutes}`;
 }
 
 function vencimento(dateStr, daysToAdd) {
-    // Cria um objeto Date a partir da string de data
-    const date = dateStr; // Adiciona 'T' para tratar a data como ISO
-
-    // Adiciona os dias à data
+    const date = dateStr;
     date.setDate(date.getDate() + daysToAdd);
-
-    // Obtém as partes da data e hora
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Janeiro é 0
+    const month = String(date.getMonth() + 1).padStart(2, '0'); 
     const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    // Formata e retorna a string no formato desejado
     return `${day}/${month}/${year} - ${hours}:${minutes}`;
 }
 
+exports.createCliente = async (req, res) => {
+    try {
+        const cliente = req.body
+        const novoCliente = await Cliente.create(cliente);
+        res.status(200).json({msg: "Cliente salvo com sucesso!", novoCliente})
+    } catch (error) {
+        res.status(500).json({error})
+    }
+}
+
+exports.checkVendedor = async (req, res) => {
+    try {
+        const {vendedorId, senha} = req.body
+        const vendedor = await Vendedor.findByPk(vendedorId);
+        if(!vendedor) return res.status(404).json({msg: "Vendedor não encontrado!"})
+        if(senha != vendedor.dataValues.senha) return res.status(401).json({msg: "Senha incorreta!"})
+        res.status(200).json({msg: "Autorizado!", vendedor})
+    } catch (error) {
+        res.status(500).json({error})
+    }
+}
+exports.getVendedores = async (req, res) => {
+    try {
+
+        const vendedores = await Vendedor.findAll({attributes: ["id", "nome"]});
+        if(!vendedores) return res.status(404).json({msg: "Vendedor não encontrado!"})
+
+        res.status(200).json({vendedores})
+    } catch (error) {
+        res.status(500).json({error})
+    }
+}
+
+exports.login = async (req, res) => {
+    try {
+        const {id, password} = req.body
+        if(!id) throw new Error("id não informado")
+
+        const vendedor = await Vendedor.findByPk(id);
+        if(!vendedor) throw new Error("Vendedor não encontrado!")
+
+        if(vendedor.senha == password){
+            res.status(200).json({token: "123"})
+        }else{
+            res.status(401).json({ error: "Senha inválida!" })
+        }
+
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+}
+
+exports.getByName = async (req, res) => {
+    try {
+        const nome = req.body.nome
+        const cliente = await Cliente.findOne({where: {nome: nome}});
+        res.status(200).json({msg: "Resgatado com sucesso!", cliente})
+    } catch (error) {
+        res.status(500).json({error})
+    }
+}
+
+exports.criarOrcamentoPage = async (req, res) => {
+    try {
+        const vendedores = await Vendedor.findAll()
+        res.render('home', { title: 'Express', vendedores });
+    } catch (error) {
+        res.status(500).json({error})
+    }
+}
 
 exports.orcamentoPage = async (req, res) => {
-    
-    const id = req.params.id;
     try {
+        const id = req.params.id;
         const orçamento = await Orçamento.findByPk(id);
-        const empresa = await Empresa.findByPk(1);
-
-        console.log("===> orçamento.dataValues.cliente", orçamento.dataValues.cliente)
-   
+        const empresa = await Empresa.findByPk(1);   
         const listaItems = JSON.parse(orçamento.dataValues.items)
         const somaTotal = listaItems.reduce((acc, e) => acc + parseFloat(e.total), 0);
     
@@ -100,27 +117,19 @@ exports.orcamentoPage = async (req, res) => {
             vendedor: JSON.parse(orçamento.dataValues.vendedor)
         });
     } catch (error) {
-        console.error("Erro ao buscar orçamento:", error);
-        res.status(500).render('500', { message: 'Erro interno do servidor' });
+        res.status(500).json({error});
     }
 }
 
 exports.createOrcamento = async (req, res) => {
-    const { produtos, formaPagamento, observacoes, cliente, vendedor } = req.body;
-
     try {
-        // Verificar se o cliente já foi cadastrado
+        const { produtos, formaPagamento, observacoes, cliente, vendedor } = req.body;
         let clienteCheck = await Cliente.findOne({ where: {nome: cliente.nome}});        
     
         if (!clienteCheck) {
             clienteCheck = await Cliente.create(cliente);
-            console.log("Novo cliente cadastrado:", clienteCheck);
-
-        } else {
-            console.log("Cliente já existe:", clienteCheck);
         }
 
-    
         const novoOrcamento = await Orçamento.create({
             data: new Date(),
             items: JSON.stringify(produtos),
@@ -132,18 +141,20 @@ exports.createOrcamento = async (req, res) => {
 
         res.status(200).json({ msg: "Orçamento criado com sucesso!", novoOrcamento });
     } catch (error) {
-        console.error("Erro ao criar orçamento:", error);
-        res.status(500).json({ msg: "Erro ao criar orçamento", error });
+        res.status(500).json({error});
     }
-};
-
-exports.getProductByEanCode = async (req, res) => {
-    const ean = req.params.ean
-    if(!ean) return res.status(401).json({msg: "Ean não foi passado!"})
-        
-    const produto = await varejo.getProductByEan(ean);
-    if(!produto) return res.status(404).json({msg: "Produto não encontrado!"})
-
-    res.status(200).json({msg: "Produto recupedado com sucesso!", produto})
 }
 
+exports.getProductByEanCode = async (req, res) => {
+    try {        
+        const ean = req.params.ean
+        if(!ean) return res.status(401).json({msg: "Ean não foi passado!"})
+            
+        const produto = await varejo.getProductByEan(ean);
+        if(!produto) return res.status(404).json({msg: "Produto não encontrado!"})
+    
+        res.status(200).json({msg: "Produto recupedado com sucesso!", produto})
+    } catch (error) {
+        res.status(500).json({error})
+    }
+}

@@ -54,7 +54,7 @@ class Produto {
 
   async getByEan(ean) {
     this.ean = ean;
-    if(this.#token == null)  this.#token = await access.getToken();
+    if (this.#token == null) this.#token = await access.getToken();
 
     try {
       const response = await fetch(`https://novaluz.varejofacil.com/api/v1/produto/codigos-auxiliares?q=id==${ean}`, {
@@ -64,9 +64,10 @@ class Produto {
           "Authorization": this.#token
         }
       });
+      
       const res = await response.json();
       this.productId = res.items[0].produtoId
-      
+
       await this.getInfo()
       await this.getPrice()
 
@@ -77,7 +78,7 @@ class Produto {
         price: this.price
       }
 
-      
+
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
     }

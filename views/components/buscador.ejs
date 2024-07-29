@@ -4,7 +4,7 @@
         <h1 class="text-center font-semibold text-xl text-gray-600">BUSCAR PRODUTO</h1>
         <hr class="flex-grow border-gray-300">
     </div>
-    <div class="flex items-center justify-center space-x-2">
+    <div class="flex  items-center justify-center space-x-2 ">
         <input id="inputEAN" type="text" class="px-4 py-2 shadow-md rounded-sm border w-full" placeholder="Codigo Auxiliar">
         <button onclick="buscarProduto()" class="px-4 p-2 bg-blue-600 hover:bg-blue-700 duration-100 hover:drop-shadow-sm text-white font-semibold">Buscar</button>
     </div>
@@ -24,6 +24,12 @@
         inputEAN.focus();
     };
 
+    function bloquearInput() {
+        inputEAN.disabled = true;
+    }
+    function desbloquearInput() {
+        inputEAN.disabled = false;
+    }
 
     function trancarSelectTabela() {
         const selectElement = document.getElementById('paymentMethod');
@@ -64,6 +70,7 @@
     }
 
     function buscarProduto(){
+        bloquearInput()
         const inputEAN = document.getElementById('inputEAN')
         if(inputEAN.value.length == 0) return alert("digite o codigo de barras!")
 
@@ -90,6 +97,8 @@
             document.getElementById('inputEAN').value = ""
             inputEAN.focus();
             trancarSelectTabela()
+            desbloquearInput()
+            inputEAN.focus();
         })
         .catch(error => {
             console.log(error)
@@ -98,6 +107,8 @@
             setTimeout(() => {
                 containerBuscador.classList.replace("border-red-500", "border-blue-500")
             }, 1000);
+            desbloquearInput()
+            inputEAN.focus();
         })
     }
     

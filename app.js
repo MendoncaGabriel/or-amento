@@ -4,10 +4,12 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const db = require('./config/database')
+const cors = require('cors')
 
 var indexRouter = require('./routes/index');
 
 var app = express();
+app.use(cors())
 
 // Tabelas
 const orçamento = require('./models/orcamentos');
@@ -15,13 +17,13 @@ const empresa = require('./models/empresa')
 const vendedor = require('./models/vendedor')
 
 // Função de sincronização modelos e tabelas
-db.sync({ force: false }) // `force: false` garante que não irá apagar tabelas existentes, `true` faz isso.
-.then(() => {
-  console.log('Tabelas sincronizadas com sucesso!');
-})
-.catch((error) => {
-  console.error('Erro ao sincronizar tabelas:', error);
-});
+// db.sync({ force: false }) // `force: false` garante que não irá apagar tabelas existentes, `true` faz isso.
+// .then(() => {
+//   console.log('Tabelas sincronizadas com sucesso!');
+// })
+// .catch((error) => {
+//   console.error('Erro ao sincronizar tabelas:', error);
+// });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
