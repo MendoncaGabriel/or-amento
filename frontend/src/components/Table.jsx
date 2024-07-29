@@ -1,75 +1,64 @@
-export default function Table(){
-    const data = [
-        { id: 1, item: 'Item 1', product: 'Produto A', quantity: 2, value: 10.00 },
-        { id: 2, item: 'Item 2', product: 'Produto B', quantity: 1, value: 20.00 },
-        { id: 3, item: 'Item 3', product: 'Produto C', quantity: 5, value: 15.00 },
-        { id: 1, item: 'Item 1', product: 'Produto A', quantity: 2, value: 10.00 },
-        { id: 2, item: 'Item 2', product: 'Produto B', quantity: 1, value: 20.00 },
-        { id: 3, item: 'Item 3', product: 'Produto C', quantity: 5, value: 15.00 },
-        { id: 1, item: 'Item 1', product: 'Produto A', quantity: 2, value: 10.00 },
-        { id: 2, item: 'Item 2', product: 'Produto B', quantity: 1, value: 20.00 },
-        { id: 3, item: 'Item 3', product: 'Produto C', quantity: 5, value: 15.00 },
-        { id: 1, item: 'Item 1', product: 'Produto A', quantity: 2, value: 10.00 },
-        { id: 2, item: 'Item 2', product: 'Produto B', quantity: 1, value: 20.00 },
-        { id: 1, item: 'Item 1', product: 'Produto A', quantity: 2, value: 10.00 },
-        { id: 2, item: 'Item 2', product: 'Produto B', quantity: 1, value: 20.00 },
-        { id: 3, item: 'Item 3', product: 'Produto C', quantity: 5, value: 15.00 },
-        { id: 1, item: 'Item 1', product: 'Produto A', quantity: 2, value: 10.00 },
-        { id: 2, item: 'Item 2', product: 'Produto B', quantity: 1, value: 20.00 },
-        { id: 3, item: 'Item 3', product: 'Produto C', quantity: 5, value: 15.00 },
-        { id: 1, item: 'Item 1', product: 'Produto A', quantity: 2, value: 10.00 },
-        { id: 2, item: 'Item 2', product: 'Produto B', quantity: 1, value: 20.00 },
-        { id: 3, item: 'Item 3', product: 'Produto C', quantity: 5, value: 15.00 },
-        { id: 1, item: 'Item 1', product: 'Produto A', quantity: 2, value: 10.00 },
-        { id: 2, item: 'Item 2', product: 'Produto B', quantity: 1, value: 20.00 },
-        { id: 3, item: 'Item 3', product: 'Produto C', quantity: 5, value: 15.00 },
-    ];
+import Price from "../utils/Price";
+import Counter from "./Counter";
+import { useContext } from "react";
+import { ProdutoListContext } from "../providers/ProdutoList";
 
-    const handleRemove = (id) => {
-        // Função para lidar com a remoção do item
-        console.log(`Remover item com ID: ${id}`);
-    };
+export default function Table() {
+    const { produtos, removeProduto, incrementQuantidade, decrementQuantidade, getQuantidadeById } = useContext(ProdutoListContext);
 
+    return (
+        <table className="w-full rounded-lg overflow-hidden">
+            <thead className="bg-indigo-700">
+                <tr className="text-left">
+                    <th className="py-3 px-4 border-b border-gray-200 text-gray-100">ID</th>
+                    <th className="py-3 px-4 border-b border-gray-200 text-gray-100">Descrição</th>
+                    <th className="py-3 px-4 border-b border-gray-200 text-gray-100">Preço</th>
+                    <th className="py-3 px-4 border-b border-gray-200 text-gray-100">Quantidade</th>
+                    <th className="py-3 px-4 border-b border-gray-200 text-gray-100">Total</th>
+                    <th className="py-3 px-4 border-b border-gray-200 text-gray-100">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {produtos.map(item => {
+                    // Verificar se o objeto price e a propriedade varejo existem
+                    const priceVarejo = item?.price?.varejo || 0;
+                    const quantidade = getQuantidadeById(item.productId);
+                    const total = priceVarejo * quantidade;
 
-    return(
-        <div className="overflow-x-auto">
-            <div className="bg-white  border-gray-200 rounded-lg shadow-md">
-                <div className="overflow-y-auto max-h-[470px]">
-                    <table className="min-w-full bg-white border border-gray-200 rounded-md overflow-hidden">
-                        <thead className="bg-indigo-700  border-b border-gray-200 sticky top-0 z-10">
-                            <tr>
-                                <th className="py-3 px-4 text-left text-gray-100 font-semibold">Item</th>
-                                <th className="py-3 px-4 text-left text-gray-100 font-semibold">Produto/Serviço</th>
-                                <th className="py-3 px-4 text-left text-gray-100 font-semibold">Quantidade</th>
-                                <th className="py-3 px-4 text-left text-gray-100 font-semibold">Valor</th>
-                                <th className="py-3 px-4 text-left text-gray-100 font-semibold">Total</th>
-                                <th className="py-3 px-4 text-left text-gray-100 font-semibold">Remover</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50">
-                                    <td className="py-3 px-4 border-b border-gray-200 text-gray-700">{item.item}</td>
-                                    <td className="py-3 px-4 border-b border-gray-200 text-gray-700">{item.product}</td>
-                                    <td className="py-3 px-4 border-b border-gray-200 text-gray-700">{item.quantity}</td>
-                                    <td className="py-3 px-4 border-b border-gray-200 text-gray-700">{item.value.toFixed(2)}</td>
-                                    <td className="py-3 px-4 border-b border-gray-200 text-gray-700">
-                                        {(item.quantity * item.value).toFixed(2)}
-                                    </td>
-                                    <td className="py-3 px-4 border-b border-gray-200 text-gray-700">
-                                        <button
-                                            onClick={() => handleRemove(item.id)}
-                                            className="text-red-500 hover:text-red-700 focus:outline-none"
-                                        >
-                                            Remover
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    )
+                    return (
+                        <tr key={item.productId} className="hover:bg-gray-50 text-sm">
+                            <td className="py-3 px-4 border-b border-gray-200 text-gray-700">
+                                {item.productId}
+                            </td>
+                            <td className="py-3 px-4 border-b border-gray-200 text-gray-700">
+                                {item.descricao}
+                            </td>
+                            <td className="py-3 px-4 border-b border-gray-200 text-gray-700 min-w-28">
+                                <Price>{priceVarejo}</Price>
+                            </td>
+                            <td className="py-3 px-4 border-b border-gray-200 text-gray-700">
+                                <Counter
+                                    incrementQuantidade={incrementQuantidade}
+                                    decrementQuantidade={decrementQuantidade}
+                                    getQuantidadeById={getQuantidadeById}
+                                    id={item.productId}
+                                />
+                            </td>
+                            <td className="py-3 px-4 border-b border-gray-200 text-gray-700 min-w-28">
+                                <Price>{total}</Price>
+                            </td>
+                            <td className="py-3 px-4 border-b border-gray-200 text-gray-700">
+                                <button
+                                    onClick={() => removeProduto(item.productId)}
+                                    className="text-red-500 hover:text-red-700 focus:outline-none"
+                                >
+                                    Remover
+                                </button>
+                            </td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
+    );
 }

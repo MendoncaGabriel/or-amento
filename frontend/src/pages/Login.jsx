@@ -59,7 +59,7 @@ export default function Login(){
     return (
         <section className="  h-full flex flex-col justify-center items-center">
             <div className="p-10 max-w-50 space-y-2 flex flex-col">
-                {JSON.stringify(user)}
+                
                 <h1 className="text-gray-500 text-center">Bem Vindo (a)</h1>
 
                 <select onChange={handleChangeUser} className="px-4 py-3 rounded-md w-full drop-shadow-md">
