@@ -3,12 +3,13 @@ import Table from "../components/Table";
 import { useContext, useState, useEffect, useRef } from "react";
 import { UserContext } from "../providers/User";
 import { ProdutoListContext } from "../providers/ProdutoList";
-
+import Notes from "../components/Notes";
+import {ComponentContext} from "../providers/Component"
 
 export default function Home() {
+    const {obs, toggleObs} = useContext(ComponentContext)
     const { user } = useContext(UserContext);
     const { addProduto } = useContext(ProdutoListContext);
-
 
     const [load, setLoad] = useState(false);
     const [input, setInput] = useState("");
@@ -25,8 +26,8 @@ export default function Home() {
     
             const data = await response.json();
     
-            console.log("Produto recebido:", data.produto); // Adicione isto para depuração
-    
+            console.log("Produto recebido:", data.produto); 
+
             addProduto(data.produto);
         } catch (error) {
             console.error("Erro ao buscar produto:", error);
@@ -58,10 +59,10 @@ export default function Home() {
         }
     };
 
-
-
+   
     return (
-        <section className="h-full flex flex-col justify-between">
+        <section className="h-full flex flex-col justify-between relative">
+            <Notes  />
   
             <div className="flex flex-col space-y-4">
                 <div className="flex items-center justify-between">
@@ -71,14 +72,14 @@ export default function Home() {
 
                 <div className="flex justify-between items-center">
                     <div className="flex space-x-4">
-                        <Button bg="blue">Observações</Button>
+                        <Button onClick={toggleObs} bg="blue">Observações</Button>
                         <Button bg="blue">Cliente</Button>
                         <Button bg="green">Gerar Nota</Button>
                     </div>
                     <Button bg="orange">Cancelar</Button>
                 </div>
 
-                <Table />
+                <Table  />
             </div>
 
             <div className="flex space-x-4">
