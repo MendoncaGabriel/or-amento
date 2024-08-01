@@ -74,3 +74,27 @@ exports.getAll = async (req, res) => {
         return res.status(500).json({ msg: "Erro ao buscar orçamentos.", error: error.message });
     }
 }
+
+
+exports.getOrcamentoById = async (req, res) => {
+    const id = req.params.id
+    const empresa = await Empresa.findByPk(1)
+    const orcamento = await Orcamento.findByPk(id, {
+        include: [
+            {
+                model: Cliente,
+                attributes: ['nome', 'telefone', 'cpf', 'cnpj', 'cep', 'rua', 'bairro', 'cidade', 'complemento']
+            },
+            {
+                model: Vendedor,
+                attributes: ['nome']
+            },
+            {
+                model: ProdutoOrcamento,
+                attributes: ['descricao', 'price', 'quantidade', 'total']
+            }
+        ]
+    });
+
+    res.render('orcamento', {orcamento, empresa})
+}

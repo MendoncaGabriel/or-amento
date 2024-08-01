@@ -40,8 +40,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Configurar o diretório para servir arquivos estáticos da aplicação React
 app.use(express.static(path.join(__dirname, './dist')));
 
+const orcamentoController = require('./controller/orcamento')
 // API routes
 app.use('/api', routers);
+app.use('/orcamento/:id', orcamentoController.getOrcamentoById);
 
 // Roteamento para servir o arquivo index.html
 app.get('*', (req, res) => {

@@ -1,16 +1,19 @@
 import Button from "../components/Button";
 import Table from "../components/Table";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef} from "react";
 import { UserContext } from "../providers/User";
 import { ProdutoListContext } from "../providers/ProdutoList";
 import Notes from "../components/Notes";
 import {ComponentContext} from "../providers/Component"
 import FormClient from "../components/FormClient";
+import { useNavigate } from "react-router-dom"
+
 
 export default function Home() {
     const {obs, toggleObs, toggleFormClient, formClient} = useContext(ComponentContext)
     const { user } = useContext(UserContext);
-    const { addProduto, produtos , subtotal, setMetodoPagamento, metodoPagamento} = useContext(ProdutoListContext);
+    const { addProduto, produtos , subtotal, setMetodoPagamento, metodoPagamento, clean} = useContext(ProdutoListContext);
+    const navigate = useNavigate()
 
     const [load, setLoad] = useState(false);
     const [input, setInput] = useState("");
@@ -29,6 +32,7 @@ export default function Home() {
     
             if(data.produto){
                 addProduto(data.produto);
+
             }else{
                 
                 alert("Produto não encontrado!")
@@ -108,6 +112,10 @@ export default function Home() {
     
             // Exibir mensagem de sucesso ou fazer algo com o resultado
             alert(result.msg || 'Orçamento criado com sucesso!');
+
+            clean()
+            navigate("/orcamentos")
+
         } catch (error) {
             console.error('Erro ao criar orçamento:', error);
             alert('Ocorreu um erro ao criar o orçamento. Por favor, tente novamente.');
@@ -115,7 +123,6 @@ export default function Home() {
     };
     
 
-   
     return (
         <section className="h-full flex flex-col justify-between relative">
             <Notes  />

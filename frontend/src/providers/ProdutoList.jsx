@@ -7,6 +7,7 @@ export const ProdutoListContext = createContext({
     decrementQuantidade: () => {},
     getQuantidadeById: () => {},
     setMetodoPagamento: () => {},
+    clean: () => {},
     produtos: [],
     subtotal: 0,
     metodoPagamento: "",
@@ -22,6 +23,11 @@ export const ProdutoListProvider = ({ children }) => {
     }, [produtos]);
     
 
+    const clean = () => {
+        setProdutos([])
+        setSubtotal(0)
+        setMetodoPagamento("varejo")
+    }
 
     const addProduto = (item) => {
         setProdutos(prev => {
@@ -69,7 +75,7 @@ export const ProdutoListProvider = ({ children }) => {
 
     return (
         <ProdutoListContext.Provider
-            value={{ addProduto, removeProduto, incrementQuantidade, decrementQuantidade, getQuantidadeById, produtos, subtotal, metodoPagamento, setMetodoPagamento}}
+            value={{ addProduto, removeProduto, incrementQuantidade, decrementQuantidade, getQuantidadeById, produtos, subtotal, metodoPagamento, setMetodoPagamento, clean}}
         >
             {children}
         </ProdutoListContext.Provider>
