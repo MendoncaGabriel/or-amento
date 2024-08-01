@@ -22,7 +22,7 @@ export default function Login(){
     }
 
     const handleLoginButton = () => {
-        fetch('http://localhost:3000/api/login', {
+        fetch('/api/login', {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(access)
@@ -50,7 +50,7 @@ export default function Login(){
     
 
     useEffect(()=>{
-        fetch('http://localhost:3000/api/vendedores')
+        fetch('/api/vendedores')
         .then(res => res.json())
         .then(res => setVendedores(res.vendedores))
     }, [])
