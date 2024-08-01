@@ -7,7 +7,7 @@ const db = require('./config/database');
 const cors = require('cors');
 
 var routers = require('./router');
-var index = require('./routes/index');
+
 
 var app = express();
 app.use(cors());
@@ -38,15 +38,16 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configurar o diretório para servir arquivos estáticos da aplicação React
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, './dist')));
+
+// API routes
+app.use('/api', routers);
 
 // Roteamento para servir o arquivo index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, './dist', 'index.html'));
 });
 
-// API routes
-app.use('/api', routers);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

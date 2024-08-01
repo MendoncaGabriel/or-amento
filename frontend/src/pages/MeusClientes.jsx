@@ -28,11 +28,11 @@ const TabelaClientes = () => {
     }
 
     return (
-<section className="space-y-4 h-full">
-    <h1 className="text-2xl font-bold drop-shadow-sm text-indigo-800">Clientes</h1>
-    <div className="bg-white rounded-lg shadow-md overflow-x-auto h-[calc(100vh-8rem)]">
-        <div className="relative">
-            <table className="divide-y divide-gray-200 w-full">
+<section className="space-y-4 ">
+    <h1 className="text-2xl font-bold drop-shadow-sm text-indigo-800 ">Clientes</h1>
+    <div className="bg-white rounded-lg shadow-md   ">
+        <div className="relative    p-1 overflow-auto max-h-[500px]">
+            <table className="divide-y divide-gray-200 w-full   ">
                 <thead className="bg-indigo-700 sticky top-0 z-10">
                     <tr>
                         <th className="py-3 px-4 border-b border-gray-200 text-gray-100">Nome</th>

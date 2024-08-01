@@ -1,4 +1,9 @@
-const express = require('express')
-const router = express.Router()
+// Em routes/vendedor.js
+const express = require('express');
+const router = express.Router();
+const vendedorController = require('../controller/vendedor');
 
-module.exports = router
+router.get("/", vendedorController.getVendedores);
+
+
+module.exports = router;

@@ -22,7 +22,7 @@ export default function Login(){
     }
 
     const handleLoginButton = () => {
-        fetch('/api/login', {
+        fetch('/api/auth/login', {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(access)
@@ -48,21 +48,36 @@ export default function Login(){
     };
         
     
-
-    useEffect(()=>{
-        fetch('/api/vendedores')
-        .then(res => res.json())
-        .then(res => setVendedores(res.vendedores))
-    }, [])
+    useEffect(() => {
+        fetch('/api/vendedor', {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log(data);
+            setVendedores(data); // Atualize o estado com a lista de vendedores
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }, []);
+    
 
     return (
         <section className="  h-full flex flex-col justify-center items-center">
+           
             <div className="p-10 max-w-50 space-y-2 flex flex-col">
                 <h1 className="text-gray-500 text-center">Bem Vindo (a)</h1>
                 <img src={Logo} alt=""  className="h-28"/>
 
                 <select onChange={handleChangeUser} className="px-4 py-3 rounded-md w-full drop-shadow-md">
-                    <option value="" selected disabled>Selecione um vendedor</option>
+                    <option value="" selected  disabled>Selecione um vendedor</option>
                     {vendedores.map((item, index)=> <option key={index + item?.id} value={item?.id}>{item?.nome}</option>)}
                    
                 </select>

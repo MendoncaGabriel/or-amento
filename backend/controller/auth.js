@@ -1,3 +1,5 @@
+const Vendedor = require('../models/vendedor')
+
 exports.login = async (req, res) => {
     try {
         const {id, password} = req.body
