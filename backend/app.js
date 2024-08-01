@@ -38,11 +38,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configurar o diretório para servir arquivos estáticos da aplicação React
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // Roteamento para servir o arquivo index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, './dist', 'index.html'));
 });
 
 // API routes
