@@ -40,7 +40,7 @@ class Produto {
         }
       });
       const resPrice = await responsePrice.json();
-      console.log(resPrice[0])
+
       this.price = {
         varejo: resPrice[0].precoVenda1,
         atacado: resPrice[0].precoVenda2,

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-500">
-    <!-- Pagina -->
+    <!-- Página -->
     <section class="bg-white m-auto w-[210mm] h-[297mm] p-2 space-y-2"> 
 
         <header class="border-2 border-black flex items-center justify-around p-5">
@@ -24,31 +24,43 @@
             </div>
         </header>
      
+        <% 
+            function formatDateTime(date) {
+                const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+                return new Date(date).toLocaleDateString('pt-BR', options).replace(',', ' -');
+            }
 
-        <section class="flex  border-2 border-black">   
-            <div class=" p-2 w-1/3 text-center">Orçamento n°: <b><%= id %></b></div>
-            <div class="border-x-2 border-black p-2 w-1/3 text-center">Emitido em: <b><%= createdAt %></b></div>
-            <div class=" p-2 w-1/3 text-center">Válido até: <b><%= vencimento %></b></div>
+            function vencimento(dateStr, daysToAdd) {
+                const date = new Date(dateStr);
+                date.setDate(date.getDate() + daysToAdd);
+                return formatDateTime(date);
+            }
+        %>
+
+        <section class="flex border-2 border-black">   
+            <div class="p-2 w-1/3 text-center">Orçamento n°: <b><%= orcamento.id %></b></div>
+            <div class="border-x-2 border-black p-2 w-1/3 text-center">Emitido em: <b><%= formatDateTime(orcamento.createdAt) %></b></div>
+            <div class="p-2 w-1/3 text-center">Válido até: <b><%= vencimento(orcamento.createdAt, 15) %></b></div>
         </section>
 
         <!-- Cliente -->
-        <section class="border-2 border-gray-800 p-4 mb-2 bg-white  shadow-md">
+        <section class="border-2 border-gray-800 p-4 mb-2 bg-white shadow-md">
             <h1 class="text-xl font-bold mb-4 text-center">CLIENTE</h1>
             <hr>
             <div>
-                <p><b>Nome:</b> <%= typeof cliente.nome != "undefined" && cliente.nome ? cliente.nome : "" %></p>
-                <p><b>Telefone:</b> <%= typeof cliente.telefone != "undefined" && cliente.telefone ? cliente.telefone : "" %></p>
-                <p><b>CPF/CNPJ:</b> <%= typeof cliente.cpf_cnpj != "undefined" && cliente.cpf_cnpj ? cliente.cpf_cnpj : "" %></p>
-                <p><b>Endereço:</b> <%= typeof cliente.endereco != "undefined" && cliente.endereco ? cliente.endereco : "" %></p>
-                <p><b>Bairro:</b> <%= typeof cliente.bairro != "undefined" && cliente.bairro ? cliente.bairro : "" %> <b>Cidade:</b> <%= typeof cliente.cidade != "undefined" && cliente.cidade ? cliente.cidade : "" %>, <b>Estado:</b> <%= typeof cliente.estado != "undefined" && cliente.estado ? cliente.estado : "" %>, <b>Cep:</b> <%= typeof cliente.cep != "undefined" && cliente.cep ? cliente.cep : "" %></p>
+                <p><b>Nome:</b> <%= orcamento.Cliente.nome || '' %></p>
+                <p><b>Telefone:</b> <%= orcamento.Cliente.telefone || '' %></p>
+                <p><b>CPF/CNPJ:</b> <%= orcamento.Cliente.cpf || orcamento.Cliente.cnpj || '' %></p>
+                <p><b>Endereço:</b> <%= orcamento.Cliente.rua || '' %></p>
+                <p><b>Bairro:</b> <%= orcamento.Cliente.bairro || '' %> <b>Cidade:</b> <%= orcamento.Cliente.cidade || '' %>, <b>Estado:</b> <%= orcamento.Cliente.estado || '' %>, <b>Cep:</b> <%= orcamento.Cliente.cep || '' %></p>
             </div>
         </section>
 
         <!-- Produtos -->
-        <div class="  border-2 border-black p-2 ">
+        <div class="border-2 border-black p-2">
             <h1 class="text-xl font-bold mb-2 text-center">ORÇAMENTO</h1>
             
-            <table class="min-w-full bg-white  shadow-md">
+            <table class="min-w-full bg-white shadow-md">
                 <thead>
                     <tr class="bg-gray-800 text-white">
                         <th class="py-3 px-6 text-left">Item</th>
@@ -59,7 +71,7 @@
                     </tr>
                 </thead>
                 <tbody>           
-                    <% items.forEach(element => { %>
+                    <% orcamento.Produto_Orcamentos.forEach(element => { %>
                         <tr class="border-b border-gray-200">
                             <td class="py-3 px-6"><%= element.productId %></td>
                             <td class="py-3 px-6"><%= element.descricao %></td>
@@ -73,30 +85,24 @@
         </div>
 
         <!-- Valores -->
-        <section class="flex  border-2 border-black overflow-hidden">
+        <section class="flex border-2 border-black overflow-hidden">
             <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>SUBTOTAL:</b> R$ -</div>
-            <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>ORÇAMENTO:</b> R$ -</div>
+            <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>ORÇAMENTO:</b> R$ <%= orcamento.subtotal.toFixed(2) %></div>
             <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>ACRÉSCIMO:</b> R$ -</div>
-            <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>TOTAL: </b>R$ <%= somaTotal %></div>
+            <div class="border-r-2 border-black p-2 w-1/3 text-center"><b>TOTAL:</b> R$ -</div>
         </section>
 
         <!-- Observações -->
-        <section class="border-2 border-black p-2 ">
+        <section class="border-2 border-black p-2">
             <h1 class="text-xl font-bold mb-2 text-center">OBSERVAÇÕES</h1>
             <hr>
             <div class="p-2">
-                <p><b>Forma de Pagamento:</b> <%= formaPagamento  %></p>
-                <!-- <p><b>Acréscimo:</b> R$ 100,00 - Por ser domingo de noite.</p>
-                <p><b>Desconto:</b> R$ 50,00 - Desconto para pagamento adiantado em Dinheiro.</p> -->
-                <p><b>Observações:</b> <%= observacoes %> </p>
-                <p><b>Vendedor (a):</b> <%= vendedor %> </p>
+                <p><b>Forma de Pagamento:</b> <%= orcamento.metodo_pagamento %></p>
+                <p><b>Observações:</b> <%= orcamento.observacoes %> </p>
+                <p><b>Vendedor (a):</b> <%= orcamento.Vendedore.dataValues.nome %> </p>
             </div>
         </section>
     </section>
     
 </body>
 </html>
-<script src="index.js">
-
-    
-</script>

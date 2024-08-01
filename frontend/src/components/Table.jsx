@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { ProdutoListContext } from "../providers/ProdutoList";
 
 export default function Table() {
-    const { produtos, removeProduto, incrementQuantidade, decrementQuantidade, getQuantidadeById } = useContext(ProdutoListContext);
+    const { produtos, removeProduto, incrementQuantidade, decrementQuantidade, getQuantidadeById, metodoPagamento } = useContext(ProdutoListContext);
 
     return (
         <table className="w-full rounded-lg overflow-hidden">
@@ -20,10 +20,10 @@ export default function Table() {
             </thead>
             <tbody>
                 {produtos.map(item => {
-                    // Verificar se o objeto price e a propriedade varejo existem
-                    const priceVarejo = item?.price?.varejo || 0;
+                    // Verificar se o objeto price e a propriedade metodoPagamento existem
+                    const price = item?.price[metodoPagamento] || 0;
                     const quantidade = getQuantidadeById(item.productId);
-                    const total = priceVarejo * quantidade;
+                    const total = price * quantidade; // Corrigido para usar price
 
                     return (
                         <tr key={item.productId} className="hover:bg-gray-50 text-sm">
@@ -34,7 +34,7 @@ export default function Table() {
                                 {item.descricao}
                             </td>
                             <td className="py-3 px-4 border-b border-gray-200 text-gray-700 min-w-28">
-                                <Price>{priceVarejo}</Price>
+                                <Price>{price}</Price>
                             </td>
                             <td className="py-3 px-4 border-b border-gray-200 text-gray-700">
                                 <Counter

@@ -9,10 +9,12 @@ export default function Menu(){
             <img src={Logo} alt="" className="w-40 m-auto" />
             <h1 className="text-center mb-2">SISTEMA DE ORÇAMENTO</h1>
             <hr />
-            <div className="flex flex-col justify-between flex-grow  p-2">
+            <div className="flex flex-col justify-between flex-grow  p-2 bg-">
                 <div className="space-y-1 flex flex-col ">
-                    <Button bg={"blue"}>Clientes</Button>
-                    <Button bg={"blue"}>Orçamentos</Button>
+                    <Button onClick={()=>navigate("/")} bg={"blue"}>Novo Orçamento</Button>
+                    <Button onClick={()=>navigate("/clientes")} bg={"blue"}>Clientes</Button>
+                    <Button  onClick={()=>navigate("/orcamentos")} bg={"blue"}>Orçamentos</Button>
+                    <Button  onClick={()=>navigate("/comissao")} bg={"blue"}>Comissão</Button>
                 </div>
                 <Button bg={"red"} onClick={() => navigate("/login")}>Sair</Button>
            

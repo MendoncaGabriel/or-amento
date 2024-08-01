@@ -3,6 +3,7 @@ const Orçamento = require('../models/orcamentos')
 const Empresa = require('../models/empresa')
 const Cliente = require('../models/cliente')
 const Vendedor = require('../models/vendedor')
+const {Orcamento, ProdutoOrcamento} = require('../models/orcamentos')
 
 function formatDateTime(date) {
     const day = String(date.getDate()).padStart(2, '0');
@@ -98,24 +99,26 @@ exports.criarOrcamentoPage = async (req, res) => {
 exports.orcamentoPage = async (req, res) => {
     try {
         const id = req.params.id;
-        const orçamento = await Orçamento.findByPk(id);
-        const empresa = await Empresa.findByPk(1);   
-        const listaItems = JSON.parse(orçamento.dataValues.items)
-        const somaTotal = listaItems.reduce((acc, e) => acc + parseFloat(e.total), 0);
-    
-        res.render('orcamento', {
-            id: id,
-            data: orçamento.dataValues.data,
-            items: listaItems,
-            createdAt: formatDateTime(orçamento.dataValues.createdAt),
-            vencimento: vencimento(orçamento.dataValues.createdAt, 15),
-            empresa,
-            formaPagamento: orçamento.formaPagamento,
-            observacoes: orçamento.dataValues.observacoes,
-            cliente: JSON.parse(orçamento.dataValues.cliente),
-            somaTotal: Number(somaTotal).toFixed(2),
-            vendedor: JSON.parse(orçamento.dataValues.vendedor)
+
+        const orcamento = await Orcamento.findByPk(id, {
+            include: [
+                {
+                    model: Cliente,
+                    attributes: ['nome', 'telefone', 'cpf', 'cnpj', 'cep', 'rua', 'bairro', 'cidade', 'complemento']
+                },
+                {
+                    model: Vendedor,
+                    attributes: ['nome']
+                },
+                {
+                    model: ProdutoOrcamento,
+                    attributes: ['descricao', 'price', 'quantidade', 'total']
+                }
+            ]
         });
+
+        const empresa = await Empresa.findByPk(1)
+        res.render('orcamento', {orcamento, empresa});
     } catch (error) {
         res.status(500).json({error});
     }

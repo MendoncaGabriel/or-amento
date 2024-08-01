@@ -11,8 +11,6 @@ export default function Login(){
     const [access, setAccess] = useState({id: "", password: "", nome:""})
     const [vendedores, setVendedores] = useState([])
 
-
-
     const handleChangeUser = (event) => {
         const selectedOption = event.target.options[event.target.selectedIndex];
         const id = event.target.value;

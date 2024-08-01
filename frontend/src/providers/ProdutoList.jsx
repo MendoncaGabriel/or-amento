@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 export const ProdutoListContext = createContext({
     addProduto: () => {},
@@ -6,11 +6,22 @@ export const ProdutoListContext = createContext({
     incrementQuantidade: () => {},
     decrementQuantidade: () => {},
     getQuantidadeById: () => {},
-    produtos: []
+    setMetodoPagamento: () => {},
+    produtos: [],
+    subtotal: 0,
+    metodoPagamento: "",
 });
 
 export const ProdutoListProvider = ({ children }) => {
     const [produtos, setProdutos] = useState([]);
+    const [subtotal, setSubtotal] = useState(0)
+    const [metodoPagamento, setMetodoPagamento] = useState("varejo")
+
+    useEffect(() => {
+        setSubtotal(produtos.reduce((acc, item) => acc + item.price[metodoPagamento] * item.quantidade, 0));
+    }, [produtos]);
+    
+
 
     const addProduto = (item) => {
         setProdutos(prev => {
@@ -58,7 +69,7 @@ export const ProdutoListProvider = ({ children }) => {
 
     return (
         <ProdutoListContext.Provider
-            value={{ addProduto, removeProduto, incrementQuantidade, decrementQuantidade, getQuantidadeById, produtos }}
+            value={{ addProduto, removeProduto, incrementQuantidade, decrementQuantidade, getQuantidadeById, produtos, subtotal, metodoPagamento, setMetodoPagamento}}
         >
             {children}
         </ProdutoListContext.Provider>

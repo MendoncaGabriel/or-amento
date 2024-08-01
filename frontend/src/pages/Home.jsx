@@ -5,11 +5,12 @@ import { UserContext } from "../providers/User";
 import { ProdutoListContext } from "../providers/ProdutoList";
 import Notes from "../components/Notes";
 import {ComponentContext} from "../providers/Component"
+import FormClient from "../components/FormClient";
 
 export default function Home() {
-    const {obs, toggleObs} = useContext(ComponentContext)
+    const {obs, toggleObs, toggleFormClient, formClient} = useContext(ComponentContext)
     const { user } = useContext(UserContext);
-    const { addProduto } = useContext(ProdutoListContext);
+    const { addProduto, produtos , subtotal, setMetodoPagamento, metodoPagamento} = useContext(ProdutoListContext);
 
     const [load, setLoad] = useState(false);
     const [input, setInput] = useState("");
@@ -19,25 +20,29 @@ export default function Home() {
         setLoad(true);
     
         try {
-            const response = await fetch(`http://localhost:3000/api/produto/${input}`, {
+            const response = await fetch(`/api/produto/${input}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             });
     
             const data = await response.json();
     
-            console.log("Produto recebido:", data.produto); 
+            if(data.produto){
+                addProduto(data.produto);
+            }else{
+                
+                alert("Produto não encontrado!")
+            }
 
-            addProduto(data.produto);
         } catch (error) {
             console.error("Erro ao buscar produto:", error);
+            alert("Produto não encontrado!")
         } finally {
             setLoad(false);
             setInput("");
         }
     };
     
-
     useEffect(() => {
         if (inputRef.current) {
             if (load) {
@@ -59,10 +64,62 @@ export default function Home() {
         }
     };
 
+    const SubmitOrcamento = async () => {
+        // Dados a serem enviados
+        const data = {
+            user: {
+                ...user,
+                open: undefined,
+                password: undefined
+            },
+            obs: {
+                ...obs,
+                open: undefined
+            },
+            produtos: produtos.map(e => ({
+                ...e,
+                price: e?.price[metodoPagamento.toLowerCase()],
+                total: e.quantidade * (e?.price[metodoPagamento.toLowerCase()] || 0)
+            })),
+            cliente: {
+                ...formClient,
+                open: undefined
+            },
+            subtotal: subtotal,
+            metodoPagamento: metodoPagamento
+        };
+    
+        try {
+            // Enviar dados para o backend
+            const response = await fetch(`/api/orcamento`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+    
+            // Verificar se a solicitação foi bem-sucedida
+            if (!response.ok) {
+                throw new Error(`Erro: ${response.statusText}`);
+            }
+    
+            // Processar a resposta
+            const result = await response.json();
+            console.log(result);
+    
+            // Exibir mensagem de sucesso ou fazer algo com o resultado
+            alert(result.msg || 'Orçamento criado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao criar orçamento:', error);
+            alert('Ocorreu um erro ao criar o orçamento. Por favor, tente novamente.');
+        }
+    };
+    
+
    
     return (
         <section className="h-full flex flex-col justify-between relative">
             <Notes  />
+            <FormClient />
   
             <div className="flex flex-col space-y-4">
                 <div className="flex items-center justify-between">
@@ -73,8 +130,18 @@ export default function Home() {
                 <div className="flex justify-between items-center">
                     <div className="flex space-x-4">
                         <Button onClick={toggleObs} bg="blue">Observações</Button>
-                        <Button bg="blue">Cliente</Button>
-                        <Button bg="green">Gerar Nota</Button>
+                        <Button onClick={toggleFormClient} bg="blue">Cliente</Button>
+                        <Button onClick={SubmitOrcamento}  bg="green">Gerar Nota</Button>
+                        <select
+                            value={metodoPagamento}
+                            onChange={(e) => setMetodoPagamento(e.target.value)}
+                            className="rounded-md px-2 drop-shadow-md"
+                        >
+                            <option value="">Selecione um método</option>
+                            <option value="varejo">Varejo</option>
+                            <option value="atacado">Atacado</option>
+                            <option value="boleto">Boleto</option>
+                        </select>
                     </div>
                     <Button bg="orange">Cancelar</Button>
                 </div>

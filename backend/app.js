@@ -6,15 +6,17 @@ var logger = require('morgan');
 const db = require('./config/database')
 const cors = require('cors')
 
-var indexRouter = require('./routes/index');
+var routers = require('./router');
+var index = require('./routes/index');
 
 var app = express();
 app.use(cors())
 
 // Tabelas
-const orçamento = require('./models/orcamentos');
-const empresa = require('./models/empresa')
-const vendedor = require('./models/vendedor')
+const {Orcamento, ProdutoOrcamento} = require('./models/orcamentos');
+const Empresa = require('./models/empresa')
+const Vendedor = require('./models/vendedor')
+const Cliente = require('./models/cliente')
 
 // Função de sincronização modelos e tabelas
 // db.sync({ force: false }) // `force: false` garante que não irá apagar tabelas existentes, `true` faz isso.
@@ -35,7 +37,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/api', routers);
+
+
+// Configurar o diretório para servir arquivos estáticos
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
