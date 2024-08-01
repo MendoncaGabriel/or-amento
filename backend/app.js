@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
 // Roteamento para servir o arquivo index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // API routes
