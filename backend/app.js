@@ -19,7 +19,7 @@ const Vendedor = require('./models/vendedor')
 const Cliente = require('./models/cliente')
 
 // Função de sincronização modelos e tabelas
-// db.sync({ force: false }) // `force: false` garante que não irá apagar tabelas existentes, `true` faz isso.
+// db.sync({ force: true }) // `force: false` garante que não irá apagar tabelas existentes, `true` faz isso.
 // .then(() => {
 //   console.log('Tabelas sincronizadas com sucesso!');
 // })
